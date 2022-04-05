@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+
 public class EmployeeJdbcDao implements Dao<Employee> {
   private static final Logger LOGGER = LogManager.getLogger(EmployeeJdbcDao.class);
   private JDBCPool jdbcPool;
@@ -59,7 +60,7 @@ public class EmployeeJdbcDao implements Dao<Employee> {
     return promises;
   }
 
-    @Override
+  @Override
   public Promise<List<Employee>> getAll() {
     Promise<List<Employee>> promise = Promise.promise();
     List<Employee> employees = new ArrayList<>();
@@ -83,13 +84,12 @@ public class EmployeeJdbcDao implements Dao<Employee> {
   }
 
   @Override
-  public void save(Employee e)  {
+  public void save(Employee e) {
     Promise<List<Employee>> promise = Promise.promise();
-    List<Employee> employee=new ArrayList<>();
-    Employee emp=new Employee();
+    List<Employee> employee = new ArrayList<>();
+    Employee emp = new Employee();
     jdbcPool.preparedQuery(PropertyFileUtils.getQuery(QueryNames.INSERT_EMPLOYEE))
-    .execute(Tuple.of(e.getId(),e.getUsername(),e.getName(),e.getDesignation(),e.getPassword(),e.getSalary()))
-//     .execute(Tuple.of(7,"jujare","ASE"))
+      .execute(Tuple.of(e.getId(), e.getUsername(), e.getName(), e.getDesignation(), e.getPassword(), e.getSalary()))
       .onSuccess(rows -> {
         for (Row row : rows) {
           emp.setId(row.getLong("id"))
@@ -102,13 +102,13 @@ public class EmployeeJdbcDao implements Dao<Employee> {
         }
         promise.tryComplete(employee);
       });
-    }
+  }
 
   @Override
   public void delete(String id) {
     Promise<List<Employee>> promise = Promise.promise();
-    List<Employee> employee1=new ArrayList<>();
-    Employee emp=new Employee();
+    List<Employee> employee1 = new ArrayList<>();
+    Employee emp = new Employee();
     jdbcPool.preparedQuery(PropertyFileUtils.getQuery(QueryNames.DELETE_EMPLOYEE))
       .execute(Tuple.of(id))
       .onSuccess(rows -> {
@@ -125,30 +125,29 @@ public class EmployeeJdbcDao implements Dao<Employee> {
       });
   }
 
+
   @Override
-  public void  update(String id)   {
+  public void update(Employee e) {
     Promise<List<Employee>> promise = Promise.promise();
-    List<Employee> employee1=new ArrayList<>();
-    Employee emp=new Employee();
-    LOGGER.info(id);
-   jdbcPool
-     .preparedQuery(PropertyFileUtils.getQuery(QueryNames.UPDATE_EMPLOYEE))
-     .execute(Tuple.of(id))
-     .onSuccess(rows -> {
-      for (Row row : rows) {
-        emp.setId(row.getLong("id"))
-          .setUsername(row.getString("username"))
-          .setName(row.getString("name"))
-          .setDesignation(row.getString("designation"))
-          .setPassword(row.getString("password"))
-          .setSalary(row.getLong("salary"));
-        employee1.add(emp);
-      }
-      promise.tryComplete(employee1);
-    });
+    List<Employee> employee1 = new ArrayList<>();
+    Employee emp = new Employee();
+    LOGGER.info(e);
+    jdbcPool
+      .preparedQuery(PropertyFileUtils.getQuery(QueryNames.UPDATE_EMPLOYEE))
+      .execute(Tuple.of(e.getDesignation(),e.getSalary(),e.getId()))
+      .onSuccess(rows -> {
+        for (Row row : rows) {
+          emp.setId(row.getLong("id"))
+            .setUsername(row.getString("username"))
+            .setName(row.getString("name"))
+            .setDesignation(row.getString("designation"))
+            .setPassword(row.getString("password"))
+            .setSalary(row.getLong("salary"));
+          employee1.add(emp);
+        }
+        promise.tryComplete(employee1);
+      });
   }
-
-
 
   private JDBCConnectOptions getJdbcConnectionOptions() {
     return new JDBCConnectOptions()
