@@ -41,13 +41,16 @@ public class ApiServer extends AbstractVerticle {
 
       router.post("/employee")
       .handler(routingContext ->  {
+        JsonObject reqJo = new JsonObject();
+
         Employee employee = Json.decodeValue(routingContext.getBody(), Employee.class);
         HttpServerResponse serverResponse = routingContext.response();
         employeeController.addEmployee(employee).future()
          .onSuccess(response -> sendResponse(routingContext, response));
         System.out.println(routingContext.getBodyAsJson());
         employees.add(employee);
-        serverResponse.end(" Employee added successfully...");
+       serverResponse.end(" Employee added successfully...");
+        routingContext.response().end(Json.encodePrettily(employees));
       });
 
     router.get("/employees")
@@ -65,17 +68,16 @@ public class ApiServer extends AbstractVerticle {
 
     router.put("/employee/:id")
       .handler(routingContext ->{
+        Employee employee = Json.decodeValue(routingContext.getBody(), Employee.class);
           String id= routingContext.request().getParam("id");
-          employeeController.updateEmpId(id).future()
+        HttpServerResponse serverResponse = routingContext.response();
+        employeeController.updateEmpId(employee).future()
             .onSuccess(response -> sendResponse(routingContext,response));
+        routingContext.response().end(Json.encodePrettily(employee));
+
         }
       );
-
-
-
-
-
-
+    
     router.delete("/employee/:id")
       .handler(routingContext -> {
         String  id = routingContext.request().getParam("id");
