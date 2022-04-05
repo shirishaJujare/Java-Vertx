@@ -26,12 +26,10 @@ public class EmployeeController {
   public Promise<Response> addEmployee(Employee e){
     List<Employee> employees = new ArrayList<>();
    Promise<Response> responsePromise = Promise.promise();
-//    Response response = new Response();
     employeeDao.save(e);
 
     return responsePromise;
   }
-
 
   public Promise<Response> getEmployees() {
     Promise<Response> responsePromise = Promise.promise();
@@ -55,7 +53,6 @@ public class EmployeeController {
   public Promise<Response> getEmployeebyId(String id) {
     Promise<Response> responsePromise = Promise.promise();
     Response response = new Response();
-//    String id=new String();
     LOGGER.info(id);
     employeeDao.get(id)
       .future()
@@ -78,20 +75,20 @@ public class EmployeeController {
     Promise<Response> responsePromise = Promise.promise();
     Response response = new Response();
     LOGGER.info("hii");
-//    String id=new String();
     employeeDao.delete(id);
 LOGGER.info(id);
 
     return responsePromise;
   }
 
-  public Promise<Response> updateEmpId(String id) {
+  public Promise<Response> updateEmpId(Employee e) {
     Promise<Response> responsePromise = Promise.promise();
     Response response = new Response();
-    employeeDao.update(id);
-    LOGGER.info("Employee updated with ID :  "  + id);
+    employeeDao.update(e);
+    LOGGER.info("Employee updated with ID :  "  + e.getId());
     return responsePromise;
   }
+
 
 
 }
