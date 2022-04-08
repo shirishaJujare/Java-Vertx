@@ -22,6 +22,26 @@ public class EmployeeController {
     employeeDao = new EmployeeJdbcDao(vertx);
   }
 
+  public Promise<Response> login(String username,String password) {
+    Promise<Response> responsePromise = Promise.promise();
+    Response response = new Response();
+//    LOGGER.info(username);
+//    LOGGER.info(password);
+    employeeDao.login(username,password)
+      .future()
+      .onSuccess(employees -> {
+        response.setStatusCode(200)
+          .setResponseBody(Json.encode(employees));
+        responsePromise.tryComplete(response);
+      })
+      .onFailure(throwable -> {
+        response.setStatusCode(500)
+          .setResponseBody(Utils.getErrorResponse(throwable.getMessage()).toString());
+        responsePromise.tryComplete(response);
+        LOGGER.catching(throwable);
+      });
+    return responsePromise;
+  }
 
   public Promise<Response> addEmployee(Employee e){
     List<Employee> employees = new ArrayList<>();
@@ -88,7 +108,6 @@ LOGGER.info(id);
     LOGGER.info("Employee updated with ID :  "  + e.getId());
     return responsePromise;
   }
-
 
 
 }
